@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Compare Samples{% endblock %}
+
+{% block content %}
+<h2>Compare Samples (1:1)</h2>
+
+<a class="btn" href="{% url 'sample_list' %}">&larr; Back to Samples</a>
+
+{% if messages %}
+<div class="card">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <h3>Select Two Samples</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Compare</button>
+    </form>
+</div>
+
+{% if comparison_done %}
+<div class="card">
+    <h3>Comparison Result</h3>
+    <p>
+        <b>Sample A:</b> {{ sample_a.sample_id }} |
+        <b>Sample B:</b> {{ sample_b.sample_id }}
+    </p>
+    <p>
+        <b>Overall Similarity Score:</b>
+        {% if overall_score >= 0.8 %}
+            <span class="score-high">{{ overall_score|floatformat:2 }}</span>
+        {% elif overall_score >= 0.4 %}
+            <span class="score-mid">{{ overall_score|floatformat:2 }}</span>
+        {% else %}
+            <span class="score-low">{{ overall_score|floatformat:2 }}</span>
+        {% endif %}
+    </p>
+    <a class="btn" href="{% url 'generate_report' sample_a.id sample_b.id %}">
+        Generate Report (PDF)
+    </a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="center">Locus</th>
+            <th class="center">Sample A</th>
+            <th class="center">Sample B</th>
+            <th class="center">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in locus_results %}
+        <tr>
+            <td class="center">{{ row.locus }}</td>
+
+            <td class="center">
+                {% if row.alleles_a %}
+                    {{ row.alleles_a.0 }}, {{ row.alleles_a.1 }}
+                {% else %}
+                    –
+                {% endif %}
+            </td>
+
+            <td class="center">
+                {% if row.alleles_b %}
+                    {{ row.alleles_b.0 }}, {{ row.alleles_b.1 }}
+                {% else %}
+                    –
+                {% endif %}
+            </td>
+
+            <td class="center">
+                {% if row.match_type == "FULL" %}
+                    <span class="match-badge match-full">FULL</span>
+                {% elif row.match_type == "PARTIAL" %}
+                    <span class="match-badge match-partial">PARTIAL</span>
+                {% elif row.match_type == "NONE" %}
+                    <span class="match-badge match-none">NONE</span>
+                {% else %}
+                    <span class="match-badge match-missing">MISSING</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+{% endblock %}

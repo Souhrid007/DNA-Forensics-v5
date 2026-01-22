@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create New DNA Sample{% endblock %}
+
+{% block content %}
+<h2>Create New DNA Evidence Sample</h2>
+
+<a class="btn" href="{% url 'sample_list' %}">&larr; Back to Samples</a>
+
+{% if messages %}
+<div class="card">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Sample</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}STR Profile{% endblock %}
+
+{% block content %}
+<h2>STR Profile Details</h2>
+
+<div class="card">
+    <p><b>Sample ID:</b> {{ sample.sample_id }}</p>
+    <p><b>Case ID:</b> {{ sample.case.case_id }}</p>
+
+    <p style="margin-top:8px;">
+        <span class="badge badge-green">STR GENERATED</span>
+        <span style="opacity:0.8; margin-left:10px;">
+            Total Loci: {{ loci_items|length }}
+        </span>
+    </p>
+</div>
+
+<div class="card">
+    <h3>Locus-wise STR Profile</h3>
+
+    <table class="table str-table">
+        <thead>
+            <tr>
+                <th style="text-align:center;">Locus</th>
+                <th style="text-align:center;">Allele 1</th>
+                <th style="text-align:center;">Allele 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for locus, alleles in loci_items %}
+            <tr>
+                <td style="text-align:center;"><b>{{ locus }}</b></td>
+                <td style="text-align:center;">{{ alleles.0 }}</td>
+                <td style="text-align:center;">{{ alleles.1 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top:16px;">
+    <a class="btn" href="{% url 'sample_list' %}">← Back to Samples</a>
+</div>
+
+{% endblock %}

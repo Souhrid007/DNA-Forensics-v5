@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Secure DNA System{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <img src="{% static 'images/Helix_logo_re.png' %}" class="nav-logo" alt="HELIX Logo">
+            <span class="brand-text">HELIX : Secure DNA System</span>
+        </div>
+
+        <!-- GLOBAL SEARCH -->
+        {% if user.is_authenticated %}
+        <form method="get" action="{% url 'global_search' %}" class="nav-search">
+            <input type="text" name="q" placeholder="Search Sample, Case, Status..." required>
+            <button type="submit">🔍</button>
+        </form>
+        {% endif %}
+
+        <div class="nav-right">
+            {% if user.is_authenticated %}
+                {{ user.username }} |
+
+                {% if user.is_superuser or user.is_staff %}
+                    <a href="{% url 'audit_log_list' %}">Audit Logs</a> |
+                {% endif %}
+
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% block full_content %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    {% endblock %}
+
+</body>
+</html>

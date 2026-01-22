@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Upload STR Profile{% endblock %}
+
+{% block content %}
+<h2>Upload STR Profile</h2>
+
+<div class="card">
+    <h3>Laboratory-Generated STR Profile</h3>
+
+    <p style="opacity:0.9;">
+        Upload an STR profile generated using validated forensic STR analysis software
+        (e.g., GeneMapper, STRaitRazor, ForenSeq).
+    </p>
+</div>
+
+<div class="card">
+    <p><b>Sample ID:</b> {{ sample.sample_id }}</p>
+    <p><b>Case ID:</b> {{ sample.case.case_id }}</p>
+
+    <hr>
+
+    <h4>Expected CSV Format</h4>
+    <ul style="margin-left:18px;">
+        <li><b>locus</b> – STR locus name (e.g., D8S1179)</li>
+        <li><b>allele1</b> – First allele value</li>
+        <li><b>allele2</b> – Second allele value</li>
+    </ul>
+
+    <p style="opacity:0.85;">
+        Example:
+        <br>
+        <code>D8S1179,13,15</code>
+    </p>
+</div>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn">
+            Upload STR Profile
+        </button>
+    </form>
+</div>
+
+<div style="margin-top:12px;">
+    <a class="btn" href="{% url 'sample_list' %}">← Back to Samples</a>
+</div>
+{% endblock %}

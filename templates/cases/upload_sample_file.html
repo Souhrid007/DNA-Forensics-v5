@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Upload DNA File{% endblock %}
+
+{% block content %}
+<h2>Upload DNA File</h2>
+
+<div class="card">
+    <p><b>Sample:</b> {{ sample.sample_id }}</p>
+    <p><b>Case:</b> {{ sample.case.case_id }} - {{ sample.case.title }}</p>
+</div>
+
+<div style="margin-bottom:12px;">
+    <a class="btn" href="{% url 'sample_list' %}">← Back to Samples</a>
+</div>
+
+{% if messages %}
+<div class="card">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Upload DNA File</button>
+    </form>
+</div>
+
+{% endblock %}

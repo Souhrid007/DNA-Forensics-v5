@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome to Secure DNA Forensic System</h2>
+
+{% if is_technician %}
+<div class="card">
+    <h3>Technician Panel</h3>
+    <a class="btn" href="{% url 'create_sample' %}">Add New DNA Evidence</a>
+    <a class="btn" href="{% url 'sample_list' %}">View Samples</a>
+</div>
+{% endif %}
+
+{% if is_analyst %}
+<div class="card">
+    <h3>Analyst Panel</h3>
+    <a class="btn" href="{% url 'compare_samples' %}">Compare Samples (1:1)</a>
+    <a class="btn" href="{% url 'search_matches' %}">Search Matches (1:N)</a>
+</div>
+{% endif %}
+
+{% if is_admin %}
+<div class="card">
+    <h3>Admin Panel</h3>
+    <a class="btn" href="/admin/">Admin Management</a>
+    <a class="btn" href="{% url 'audit_log_list' %}">Audit Logs</a>
+</div>
+{% endif %}
+{% endblock %}

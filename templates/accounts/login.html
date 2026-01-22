@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Login - Secure DNA{% endblock %}
+
+{% block full_content %}
+<style>
+.login-bg {
+    min-height: calc(100vh - 60px); /* subtract navbar height */
+    width: 100%;
+    background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url("{% static 'images/login_dna.png' %}") no-repeat center center;
+    background-size: 100% 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.login-card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 380px;
+    color: white;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.login-card input {
+    width: 100%;
+}
+
+.login-card button {
+    width: 100%;
+}
+
+.login-card.split {
+    display: flex;
+    max-width: 820px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 18px;
+
+    /* 3D pop-out illusion */
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.6),
+        0 0 40px rgba(120,90,255,0.25);
+    transform: perspective(1000px) translateZ(30px);
+}
+
+.login-card.split:hover {
+    transform: perspective(1000px) translateZ(40px) scale(1.01);
+    box-shadow:
+        0 25px 50px rgba(0,0,0,0.7),
+        0 0 55px rgba(140,120,255,0.35);
+    transition: 0.4s ease;
+}
+.password-box {
+    position: relative;
+    width: 100%;
+}
+
+.password-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 45px;  
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+
+.toggle-eye:hover {
+    opacity: 1;
+}
+
+.toggle-eye svg {
+    transition: 0.2s;
+}
+
+.toggle-eye:hover svg {
+    transform: scale(1.1);
+}
+.toggle-eye svg {
+    opacity: 0.7;
+}
+
+.toggle-eye:hover svg {
+    opacity: 1;
+}
+
+.login-left input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-left p,
+.password-wrap {
+    margin-bottom: 14px;
+}
+
+.login-left button {
+    width: 100%;
+    margin-top: 18px;  
+}
+
+.login-logo {
+    display: block;
+    margin: 0 auto 8px auto;   
+    height: 240px;         
+    width: auto;
+}
+
+
+</style>
+
+<div class="login-bg">
+  <div class="login-card split">
+
+    <!-- LEFT: FORM -->
+    <div class="login-left">
+        <img src="{% static 'images/Helix_logo_full.png' %}" class="login-logo" alt="HELIX Logo">
+
+        <p style="text-align:center; opacity:0.85; margin-top:2px;">Login Portal</p>
+
+        {% if form.errors %}
+        <p style="color:#ffb3b3; text-align:center;">Invalid username or password</p>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <p>
+                {{ form.username.label_tag }}
+                {{ form.username }}
+            </p>
+
+            <div class="password-wrap">
+                {{ form.password.label_tag }}
+                <div class="password-box">
+                    {{ form.password }}
+                    <span class="toggle-eye" onclick="togglePassword()" id="eyeIcon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M1 12C3.5 7 7.5 4 12 4C16.5 4 20.5 7 23 12C20.5 17 16.5 20 12 20C7.5 20 3.5 17 1 12Z"
+                                stroke="black" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="3" stroke="black" stroke-width="2"/>
+                    </svg>
+                    </span>
+                </div>
+            </div>
+
+
+            <button type="submit">Login</button>
+        </form>
+
+
+        <div style="margin-top:15px; text-align:center;">
+            <a href="/admin/" style="color:#ddd;">Admin Login</a>
+        </div>
+    </div>
+
+    <!-- RIGHT: IMAGE -->
+    <div class="login-right">
+        <img src="{% static 'images/intro_login.png' %}" alt="Forensic Intro">
+    </div>
+
+  </div>
+</div>
+
+<script>
+const card = document.querySelector('.login-card.split');
+
+if (card) {
+  document.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+
+    const inside =
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom;
+
+    if (inside) {
+      // Keep card steady when cursor is inside
+      card.style.transform = 'perspective(1000px) translateZ(30px)';
+      return;
+    }
+
+    // Cursor is outside → tilt toward cursor
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+
+    const rotateY = dx / 80;
+    const rotateX = -dy / 80;
+
+    card.style.transform =
+      `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(30px)`;
+  });
+}
+</script>
+
+<script>
+function togglePassword() {
+  const input = document.querySelector('.password-box input');
+  const eye = document.getElementById('eyeIcon');
+
+  if (!input) return;
+
+  if (input.type === "password") {
+    input.type = "text";
+    eye.style.opacity = "0.5";   // indicate "shown"
+  } else {
+    input.type = "password";
+    eye.style.opacity = "1";     // indicate "hidden"
+  }
+}
+</script>
+
+
+
+{% endblock %}

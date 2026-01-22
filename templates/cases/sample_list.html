@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Samples - Secure DNA{% endblock %}
+
+{% block content %}
+<h2>Samples</h2>
+
+<div class="action-buttons" style="margin-bottom:12px;">
+    {% if is_technician %}
+        <a class="btn" href="{% url 'create_sample' %}">
+            + Add New DNA Evidence Sample
+        </a>
+    {% endif %}
+
+    {% if is_admin %}
+        <a class="btn" href="/admin/">Go to Admin</a>
+    {% endif %}
+
+    {% if is_analyst or is_admin %}
+        <a class="btn" href="{% url 'compare_samples' %}">Compare Samples (1:1)</a>
+        <a class="btn" href="{% url 'search_matches' %}">Search Matches (1:N)</a>
+    {% endif %}
+</div>
+
+{% if messages %}
+    <div class="card">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sample ID</th>
+            <th>Case ID</th>
+            <th>Status</th>
+            <th style="text-align:center;">Has DNA File?</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sample in samples %}
+        <tr>
+            <td><b>{{ sample.sample_id }}</b></td>
+            <td>{{ sample.case.case_id }}</td>
+
+            <td>
+                {% if sample.status == "UPLOADED" %}
+                    <span class="badge badge-gray">DNA UPLOADED</span>
+                {% elif sample.status == "STR_PENDING" %}
+                    <span class="badge badge-orange">STR PENDING</span>
+                {% elif sample.status == "STR_GENERATED" %}
+                    <span class="badge badge-green">STR GENERATED</span>
+                {% elif sample.status == "MATCHED" %}
+                    <span class="badge badge-blue">MATCHED</span>
+                {% else %}
+                    {{ sample.get_status_display }}
+                {% endif %}
+            </td>
+
+            <td style="text-align:center;">
+                {% if sample.raw_storage_key %}✅{% else %}❌{% endif %}
+            </td>
+
+            <td>
+                <div class="action-buttons action-col">
+                    {% if is_technician %}
+                        <a class="btn small-btn" href="{% url 'upload_sample_file' sample.id %}">
+                            Upload / Replace DNA
+                        </a>
+                    {% endif %}
+
+                    {% if sample.str_profile %}
+                        <a class="btn small-btn" href="{% url 'view_str_profile' sample.id %}">
+                            View STR Profile
+                        </a>
+                    {% else %}
+                        {% if is_technician %}
+                            <a class="btn small-btn" href="{% url 'upload_str_csv' sample.id %}">
+                                Upload STR Profile
+                            </a>
+                        {% else %}
+                            <span style="opacity:0.7;">No STR profile</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No samples found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

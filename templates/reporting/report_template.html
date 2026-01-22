@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Forensic DNA Report</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #111;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 6px;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            font-size: 14px;
+            margin-top: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 3px;
+        }
+
+        h3 {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .section {
+            margin-top: 12px;
+        }
+
+        .meta p {
+            margin: 2px 0;
+        }
+
+        .score-box {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px;
+            margin-top: 6px;
+            width: fit-content;
+            border-radius: 6px;
+        }
+
+        .score-high {
+            background: #e6fff3;
+            color: #007f5f;
+            border: 1px solid #007f5f;
+        }
+
+        .score-mid {
+            background: #fff6e0;
+            color: #b8860b;
+            border: 1px solid #b8860b;
+        }
+
+        .score-low {
+            background: #ffecec;
+            color: #b00020;
+            border: 1px solid #b00020;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .full { background: #d1fae5; color: #065f46; }
+        .partial { background: #fef3c7; color: #92400e; }
+        .none { background: #fee2e2; color: #7f1d1d; }
+        .missing { background: #e5e7eb; color: #374151; }
+
+        .footer {
+            margin-top: 16px;
+            font-size: 9px;
+            border-top: 1px solid #aaa;
+            padding-top: 4px;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Forensic DNA Comparison Report</h1>
+
+    <div class="section">
+        <h2>Case Information</h2>
+        <p>
+            <strong>Case ID:</strong> {{ case.case_id }}<br>
+            <strong>Case Title:</strong> {{ case.title }}<br>
+            <strong>Case Status:</strong> {{ case.status }}<br>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Samples Involved</h2>
+        <h3>Query Sample (Crime Scene)</h3>
+        <p>
+            <strong>Sample ID:</strong> {{ query_sample.sample_id }}<br>
+            <strong>Case ID:</strong> {{ query_sample.case.case_id }}<br>
+            <strong>Uploaded At:</strong> {{ query_sample.uploaded_at|date:"Y-m-d H:i" }}<br>
+        </p>
+
+        <h3>Target Sample (Database Match)</h3>
+        <p>
+            <strong>Sample ID:</strong> {{ target_sample.sample_id }}<br>
+            <strong>Case ID:</strong> {{ target_sample.case.case_id }}<br>
+            <strong>Uploaded At:</strong> {{ target_sample.uploaded_at|date:"Y-m-d H:i" }}<br>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Overall Matching Result</h2>
+        <div class="score-box
+            {% if overall_score >= 0.8 %}score-high
+            {% elif overall_score >= 0.4 %}score-mid
+            {% else %}score-low
+            {% endif %}
+        ">
+            Overall Similarity Score: {{ overall_score|floatformat:2 }}
+        </div>
+    </div>
+    <div class="section">
+        <h2>STR Locus-wise Comparison</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Locus</th>
+                    <th>Query Alleles</th>
+                    <th>Target Alleles</th>
+                    <th>Locus Score</th>
+                    <th>Match Type</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in locus_results %}
+            <tr>
+                <td>{{ row.locus }}</td>
+                <td>{{ row.alleles_a }}</td>
+                <td>{{ row.alleles_b }}</td>
+                <td>{{ row.score }}</td>
+                <td>
+                    {% if row.match_type == "FULL" %}
+                        <span class="badge full">FULL</span>
+                    {% elif row.match_type == "PARTIAL" %}
+                        <span class="badge partial">PARTIAL</span>
+                    {% elif row.match_type == "NONE" %}
+                        <span class="badge none">NONE</span>
+                    {% else %}
+                        <span class="badge missing">MISSING</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Integrity & Chain of Custody</h2>
+        <p>
+            <strong>Query STR Profile Storage Key:</strong> {{ query_profile.storage_key }}<br>
+            <strong>Query STR Profile Hash (SHA-256):</strong> {{ query_profile.hash }}<br><br>
+
+            <strong>Target STR Profile Storage Key:</strong> {{ target_profile.storage_key }}<br>
+            <strong>Target STR Profile Hash (SHA-256):</strong> {{ target_profile.hash }}<br>
+        </p>
+        {% if user %}
+        <p>
+            <strong>Report Generated By:</strong> {{ user.username }}<br>
+        </p>
+        {% endif %}
+    </div>
+    <div class="footer">
+        <p>
+            This report was generated by the HELIX system.
+        </p>
+        <p>
+            Generated by: {{ user.username }} | Timestamp: {{ query_sample.uploaded_at|date:"Y-m-d H:i" }}
+        </p>
+        <p>
+            This report is intended for forensic analysis and investigative use only.
+        </p>
+    </div>
+</body>
+</html>
