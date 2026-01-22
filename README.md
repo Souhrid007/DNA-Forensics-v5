@@ -3,7 +3,8 @@
 Requirements:  
 Django, MinIo SDK  
 
-Has animations  
+Major Update  
+UI and report generation modification.  
 
 To run go to the directory of manage.py.  
 Then run the following:  
